@@ -1,3 +1,6 @@
+//envs yay
+require('dotenv').config();
+
 // here be bots
 const Discord = require('discord.js');
 const viadana = new Discord.Client();
@@ -12,4 +15,4 @@ client.on('message', message => {
     }
 });
 
-client.login('token');
+client.login(process.env.DISCORD_TOKEN);
