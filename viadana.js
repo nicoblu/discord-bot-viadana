@@ -29,12 +29,12 @@ setInterval( () => {
 }, 86400000);
 
 viadana.on('message', message => {
+    if (message.author.bot) return;
+
     let content = message.content.split(' ');
     let command = content[0].toLowerCase();
     let user = message.member.user.id;
     let re = /infowars/
-
-    if (message.author.bot) return;
 
     if (message.content.search(re) > -1) {
         message.channel.send({embed: {
