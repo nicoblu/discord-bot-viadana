@@ -29,6 +29,7 @@ setInterval( () => {
 }, 86400000);
 
 viadana.on('message', message => {
+    //moved to avoid bot conflicts
     if (message.author.bot) return;
 
     let content = message.content.split(' ');
@@ -36,6 +37,7 @@ viadana.on('message', message => {
     let user = message.member.user.id;
     let re = /infowars/
 
+    //puts embedded message for infowars.com when infowars is mentioned in chat
     if (message.content.search(re) > -1) {
         message.channel.send({embed: {
             color: 0xCC99FF,
@@ -52,6 +54,7 @@ viadana.on('message', message => {
         });
     }
 
+    //allows users to set their zipcodes for weather lookup
     if (command === '.setwea') {
         if (content[1] === undefined) {
         	message.channel.send('use `.setwea ZIPCODE` to set your location')
@@ -61,6 +64,7 @@ viadana.on('message', message => {
         }
     }
 
+    //allows user to check what their zip is set to
     if (command === '.checkzip') {
     	if (zipCodes[user] === undefined) {
     		message.channel.send('use `.setwea ZIPCODE` to set your location')
@@ -71,7 +75,8 @@ viadana.on('message', message => {
 
     //manual command to write zips to file
     if (command === '.write'){
-        if (user === '122879110472138753'){
+        //allows only the owner to do this
+        if (user === `${process.env.BOT_OWNER}`){
             manualWrite();            
             message.channel.send('File written');
         } else {
@@ -79,6 +84,7 @@ viadana.on('message', message => {
         }
     }
 
+    //use openweathermap to check weather at user set zip
     if (command === '.wea') {
     	let weatherURL = `http://api.openweathermap.org/data/2.5/weather?zip=${zipCodes[message.member.user.id]}&units=imperial&appid=${process.env.OPENWEATHERMAP_API_KEY}`;
     	axios.get(weatherURL).then( (weatherData) => {
@@ -98,7 +104,7 @@ viadana.on('message', message => {
         message.channel.send('pls show bobs and vagene bby',{tts:true})
     }
 
-    //eh, gonna keep it anyway
+    //an attempt to use a quick web search, but duckduckgo has a pretty empty api
     if (command === '.goduckyourself'){
         let searchPhrase = content.splice(1).join(' ');
         axios.get(`https://api.duckduckgo.com/?q=${searchPhrase}&format=json&t=viadanadiscordbot`).then( results => {
@@ -112,7 +118,7 @@ viadana.on('message', message => {
 
     }
 
-    //because this is still more useful than DuckDuckGo's API
+    //because this is still more useful than DuckDuckGo's API. basic let me google that for you search with an embedded link return
     if (command === '.lmgtfy'){
         let query = content.slice(1).join('+');
         message.channel.send({embed: {
@@ -130,7 +136,7 @@ viadana.on('message', message => {
     });
     }
 
-    //might as well
+    //youtube version of prior command
     if (command === '.lmyttfy'){
         let query = content.slice(1).join('+');
         message.channel.send({embed: {
