@@ -13,20 +13,9 @@ const convertDegrees = require('./convertDegrees.js')
 let rawData = fs.readFileSync('./zips.json');
 let zipCodes = JSON.parse(rawData);
 
-const manualWrite = () => {
-    let addZips = JSON.stringify(zipCodes, null, 2);
-    fs.writeFileSync('zips.json', addZips);
-    console.log('added new items to file')  
-}
-
 viadana.on('ready', () => {
     console.log(`Logged in as ${viadana.user.tag}!`);
 });
-
-//write JSON file once every 24 Hours
-setInterval( () => {
-    manualWrite();
-}, 86400000);
 
 viadana.on('message', message => {
     //moved to avoid bot conflicts
@@ -35,9 +24,10 @@ viadana.on('message', message => {
     let content = message.content.split(' ');
     let command = content[0].toLowerCase();
     let user = message.member.user.id;
-    let re = /infowars/
 
     //puts embedded message for infowars.com when infowars is mentioned in chat
+    let re = /infowars/
+
     if (message.content.search(re) > -1) {
         message.channel.send({embed: {
             color: 0xCC99FF,
@@ -59,7 +49,10 @@ viadana.on('message', message => {
         if (content[1] === undefined) {
         	message.channel.send('use `.setwea ZIPCODE` to set your location')
         } else {
+            //set zip and save to file
         	zipCodes[user] = content[1]
+            let addZips = JSON.stringify(zipCodes, null, 2);
+            fs.writeFileSync('zips.json', addZips);            
       		message.reply(`Zip Code set to ${zipCodes[user]}`)
         }
     }
@@ -71,17 +64,6 @@ viadana.on('message', message => {
     	} else {
     		message.reply(`Your Zip Code is set to ${zipCodes[user]}`)
     	}
-    }
-
-    //manual command to write zips to file
-    if (command === '.write'){
-        //allows only the owner to do this
-        if (user === `${process.env.BOT_OWNER}`){
-            manualWrite();            
-            message.channel.send('File written');
-        } else {
-            message.channel.send('No. Go away.')
-        }
     }
 
     //use openweathermap to check weather at user set zip
